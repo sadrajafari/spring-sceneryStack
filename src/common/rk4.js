@@ -1,8 +1,8 @@
 export default function rk4Step(state, params, vdotFunc, xdotFunc, ref, dt, time) {
     const { beta, f, omega, omega0 } = params;
-    let drivingForceValue = 0;
-    let springForceValue = 0;
-    let dragForceValue = 0;
+    let drivingForceValue = undefined;
+    let springForceValue = undefined;
+    let dragForceValue = undefined;
 
     let error = false
 

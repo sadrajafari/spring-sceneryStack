@@ -2,13 +2,14 @@ import { ScreenView, ScreenViewOptions, Sim } from "scenerystack/sim";
 import { SimModel } from "../model/SimModel.js";
 import { ResetAllButton } from "scenerystack/scenery-phet";
 import { Circle, Color, DOM, HBox, Rectangle, RichText, Text, VBox, Node } from "scenerystack/scenery";
-import { HSlider, Panel, Vector2, Range, DerivedProperty, RoundToggleButton, Property, RectangularToggleButton, RectangularPushButton } from "scenerystack";
+import { HSlider, Panel, Vector2, Range, DerivedProperty, RoundToggleButton, Property } from "scenerystack";
 // @ts-ignore
 import EquationInput from './EquationInput.js';
 // @ts-ignore
 import rk4Step from '../../common/rk4.js';
 import { GraphComponent } from '../../common/graph.js';
-import { CarouselComboBox, ComboBoxItem } from 'scenerystack/sun';
+import { CarouselComboBox, RectangularToggleButton } from 'scenerystack/sun';
+// @ts-ignore
 import drawVector from '../../common/drawVector.js';
 import VectorLegend from '../../common/VectorLegend.ts';
 
@@ -78,6 +79,17 @@ export class SimScreenView extends ScreenView {
   dragVectorCtxTest: CanvasRenderingContext2D;
   private graphUpdateCounter = 0;
   private readonly GRAPH_UPDATE_INTERVAL = 3;
+  equationDetectionPanel: Panel;
+  existdrivingForceTest: boolean;
+  existspringForceTest: boolean;
+  existdragForceTest: boolean;
+  availableSpringForce: Text;
+  availableDragForce: Text;
+  notAvailableSpringForce: Text;
+  availableDrivingForce: Text;
+  notAvailableDragForce: Text;
+  notAvailableDrivingForce: Text;
+  focusedEquationInput: any;
 
 
 
@@ -277,14 +289,63 @@ export class SimScreenView extends ScreenView {
 
 
 
+    this.vdotxInput.mathDiv.addEventListener('focusin', () => {
+      this.focusedEquationInput = this.vdotxInput;
+    });
+    this.xdotInput.mathDiv.addEventListener('focusin', () => {
+      this.focusedEquationInput = this.xdotInput;
+    });
+
+    const insertOmega0Property = new Property(false);
+    const insertOmegaProperty = new Property(false);
+    const insertBetaProperty = new Property(false);
+
+    const omega0Button = new RectangularToggleButton(insertOmega0Property, false, true, {
+      content: new Text('insert (ω₀)', { fontSize: 13 }),
+      cornerRadius: 6
+    });
+    const omegaButton = new RectangularToggleButton(insertOmegaProperty, false, true, {
+      content: new Text('insert (ω)', { fontSize: 13 }),
+      cornerRadius: 6
+    });
+    const betaButton = new RectangularToggleButton(insertBetaProperty, false, true, {
+      content: new Text('insert (β)', { fontSize: 13 }),
+      cornerRadius: 6
+    });
+
+    insertOmega0Property.lazyLink(pressed => {
+      if (pressed && this.focusedEquationInput) {
+        this.focusedEquationInput.mathField.write('\\omega_0');
+        this.focusedEquationInput.mathField.focus();
+        setTimeout(() => insertOmega0Property.value = false, 0);
+      }
+    });
+    insertOmegaProperty.lazyLink(pressed => {
+      if (pressed && this.focusedEquationInput) {
+        this.focusedEquationInput.mathField.write('\\omega');
+        this.focusedEquationInput.mathField.focus();
+        setTimeout(() => insertOmegaProperty.value = false, 0);
+      }
+    });
+    insertBetaProperty.lazyLink(pressed => {
+      if (pressed && this.focusedEquationInput) {
+        this.focusedEquationInput.mathField.write('\\beta');
+        this.focusedEquationInput.mathField.focus();
+        setTimeout(() => insertBetaProperty.value = false, 0);
+      }
+    });
 
 
 
+    const insertButtonsBox = new HBox({
+      children: [new Rectangle(10, 10, 20, 0), omega0Button, omegaButton, betaButton],
+      spacing: 8
+    });
 
 
     const equationPanel = new Panel(new VBox({
       align: 'center',
-      children: [new Text("Equations", { fontSize: 16 }), new Rectangle(0, 0, 5, 5), new HBox({ children: [new RichText("<em><p>v&#x0307; =</p></em>"), new Rectangle(0, 0, 10, 0), vdotxInput] }), new Rectangle(0, 0, 10, 10), new HBox({ children: [new RichText("<em><p>x&#x0307; = </p></em>"), new Rectangle(0, 0, 13, 0), xdotInput] })]
+      children: [new Text("Equations", { fontSize: 16 }), new Rectangle(0, 0, 5, 5), insertButtonsBox, new Rectangle(0, 0, 5, 5), new HBox({ children: [new RichText("<em><p>v&#x0307; =</p></em>"), new Rectangle(0, 0, 10, 0), vdotxInput] }), new Rectangle(0, 0, 10, 10), new HBox({ children: [new RichText("<em><p>x&#x0307; = </p></em>"), new Rectangle(0, 0, 13, 0), xdotInput] })]
     }), { fill: new Color("#d3d3d3"), maxWidth: 290 })
 
     this.addChild(equationPanel);
@@ -320,6 +381,60 @@ export class SimScreenView extends ScreenView {
 
     this.addChild(otherPanel);
     otherPanel.leftTop = new Vector2(10, equationPanel.leftBottom.y + 10);
+
+
+
+
+    const availableSpringForce = new Text("Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
+    const availableDragForce = new Text("Drag Force Detected", { fontSize: 15, fill: '#16960b' });
+    const availableDrivingForce = new Text("Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
+    const notAvailableSpringForce = new Text("No Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
+    const notAvailableDragForce = new Text("No Drag Force Detected", { fontSize: 15, fill: '#16960b' });
+    const notAvailableDrivingForce = new Text("No Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
+
+    this.availableSpringForce = availableSpringForce;
+    this.availableDragForce = availableDragForce;
+    this.availableDrivingForce = availableDrivingForce;
+    this.notAvailableSpringForce = notAvailableSpringForce;
+    this.notAvailableDragForce = notAvailableDragForce;
+    this.notAvailableDrivingForce = notAvailableDrivingForce;
+
+    const equationDetectionPanel = new Panel(new VBox({
+      align: 'left',
+      children: [
+        this.availableSpringForce,
+        this.availableDragForce,
+        this.availableDrivingForce,
+        this.notAvailableSpringForce,
+        this.notAvailableDragForce,
+        this.notAvailableDrivingForce
+      ]
+    }), { fill: new Color("rgb(255, 255, 255) "), maxWidth: 290 });
+
+    this.addChild(equationDetectionPanel);
+    this.equationDetectionPanel = equationDetectionPanel;
+    equationDetectionPanel.leftTop = new Vector2(equationPanel.rightTop.x + 5, equationPanel.rightCenter.y - 20);
+
+    equationDetectionPanel.opacity = 0; // Initially disabled
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1158,6 +1273,39 @@ export class SimScreenView extends ScreenView {
 
   }
 
+
+
+
+
+  updateEquationDetectionPanel() {
+    const contentNode = this.equationDetectionPanel._content as VBox;
+    contentNode.removeAllChildren();
+
+    if (this.existspringForceTest) {
+      contentNode.addChild(this.availableSpringForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    } else {
+      contentNode.addChild(this.notAvailableSpringForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    }
+
+    if (this.existdragForceTest) {
+      contentNode.addChild(this.availableDragForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    } else {
+      contentNode.addChild(this.notAvailableDragForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    }
+
+    if (this.existdrivingForceTest) {
+      contentNode.addChild(this.availableDrivingForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    } else {
+      contentNode.addChild(this.notAvailableDrivingForce);
+      contentNode.addChild(new Rectangle(0, 0, 0, 2));
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public step(dt: number): void {
 
@@ -1291,10 +1439,25 @@ export class SimScreenView extends ScreenView {
 
 
 
+        this.equationDetectionPanel.opacity = 1;
+        if (drivingForceTest !== undefined) {
+          this.existdrivingForceTest = true;
+        } else {
+          this.existdrivingForceTest = false;
+        }
+        if (springForceTest !== undefined) {
+          this.existspringForceTest = true;
+        } else {
+          this.existspringForceTest = false;
+        }
+        if (dragForceTest !== undefined) {
+          this.existdragForceTest = true;
+        } else {
+          this.existdragForceTest = false;
+        }
 
 
-
-
+        this.updateEquationDetectionPanel();
 
         const boxLeft = this.playAreaCenter + this.newXTest * this.scale - this.boxWidth / 2;
         const boxCenter = boxLeft + this.boxWidth / 2;
@@ -1367,6 +1530,8 @@ export class SimScreenView extends ScreenView {
 
 
 
+      } else {
+        this.equationDetectionPanel.opacity = 0;
       }
 
 

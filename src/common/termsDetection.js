@@ -2,55 +2,95 @@ export default class TermHighlighter {
     constructor(mathDiv) {
         this.mathDiv = mathDiv;
         this.nodeArray = Array.from(mathDiv.querySelectorAll('*'));
+        this.reset();
 
     }
 
-    highlightVariable(v, color) {
-        this.nodeArray.map(node => {
-            node.style.color = ` black `;
-
+    reset() {
+        // Reset all colors
+        this.nodeArray.forEach(node => {
+            node.style.color = 'black';
         });
+        return this;
+    }
+
+    highlightVariable(element, color) {
+
         this.nodeArray.forEach((node, idx) => {
-            if (node.textContent.includes(v)) {
-                node.style.color = ` ${color} `;
-                let prevText = this.nodeArray[idx - 1]?.textContent || '';
-                let nextText = this.nodeArray[idx + 1]?.textContent || '';
+            console.log(this.nodeArray[idx].textContent);
+            if (node.textContent.length === 1) {
+                if (node.textContent.includes(element)) {
+                    node.style.color = color;
 
 
-                // Check next sibling nodes for + or -
-                // Handle backwards (coefficients and signs)
-                let prevIdx = idx - 1;
-                while (prevIdx >= 0) {
-                    if (this.nodeArray[prevIdx].textContent === "+" || this.nodeArray[prevIdx].textContent === "−") {
-                        this.nodeArray[prevIdx].style.color = ` ${color} `;
-                        break; // Stop at next operator, don't color it
+
+                    if (this.nodeArray[idx - 1].textContent === "·") {
+                        let openParenthesisCount = 0;
+                        for (let i = idx - 1; i >= 0; i--) {
+                            this.nodeArray[i].style.color = color
+                            if (this.nodeArray[i].textContent === ")") {
+                                openParenthesisCount++;
+                            }
+                            if (openParenthesisCount !== 0) {
+                                this.nodeArray[i].style.color = color
+                            }
+                            if (this.nodeArray[i].textContent === "(") {
+                                openParenthesisCount--;
+                            }
+                            if (openParenthesisCount === 0) {
+
+                                if (this.nodeArray[i].textContent === "−") {
+                                    break;
+                                }
+                                if (this.nodeArray[i].textContent === "+") {
+                                    break;
+                                }
+                            }
+
+                        }
                     }
-                    
-                    this.nodeArray[prevIdx].style.color = ` ${color} `;
-                    prevIdx--;
+
+
+
+
+
+                    if (this.nodeArray[idx + 1].textContent === "·") {
+                        let openParenthesisCount = 0;
+                        for (let i = idx + 1; i < this.nodeArray.length; i++) {
+                            if (openParenthesisCount === 0) {
+
+                                if (this.nodeArray[i].textContent === "−") {
+                                    break;
+                                }
+                                if (this.nodeArray[i].textContent === "+") {
+                                    break;
+                                }
+                            }
+                            this.nodeArray[i].style.color = color
+                            if (this.nodeArray[i].textContent === "(") {
+                                openParenthesisCount++;
+                            }
+                            if (openParenthesisCount !== 0) {
+                                this.nodeArray[i].style.color = color
+                            }
+                            if (this.nodeArray[i].textContent === ")") {
+                                openParenthesisCount--;
+                            }
+
+                        }
+                    }
+
+                    if (this.nodeArray[idx - 1].textContent === "−") {
+                        this.nodeArray[idx - 1].style.color = color;
+                    }
+                    if (this.nodeArray[idx - 1].textContent === "+") {
+                        this.nodeArray[idx - 1].style.color = color;
+                    }
+
+
                 }
-
-                // // Handle forwards (powers, etc.) - ADD THIS
-                // let nextIdx = idx + 1;
-                // let openParenCount = 0;
-                // while (nextIdx < this.nodeArray.length) {
-
-                //     if (this.nodeArray[nextIdx].textContent === "(") {
-                //         openParenCount++;
-                //     }
-                //     if (this.nodeArray[nextIdx].textContent === ")") {
-                //         openParenCount--;
-                //     }
-                //     if (openParenCount === 0) {
-                //         if (this.nodeArray[nextIdx].textContent === "+" || this.nodeArray[nextIdx].textContent === "−") {
-                //             break; // Stop at next operator, don't color it
-                //         }
-                //     }
-                //     this.nodeArray[nextIdx].style.color = ` ${color} `;
-                //     nextIdx++;
-                // }
-
             }
+
         });
 
     }
