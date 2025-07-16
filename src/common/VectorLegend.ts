@@ -12,7 +12,7 @@ export default function VectorLegend(): DOM {
   const CANVAS_WIDTH = 100;
   const CANVAS_HEIGHT = 40;
 
-  function createLegendItem(color: string, label: string, arrowLength = 6) {
+  function createLegendItem(color: string, label: string, type: string, arrowLength = 25) {
     const item = document.createElement('div');
     // Stack arrow above text, centered
     item.style.display = 'flex';
@@ -25,7 +25,7 @@ export default function VectorLegend(): DOM {
     arrowCanvas.width = CANVAS_WIDTH;
     arrowCanvas.height = CANVAS_HEIGHT;
     const ctx = arrowCanvas.getContext('2d')!;
-    drawVector(arrowLength, ctx, arrowCanvas, color);
+    drawVector(arrowLength, ctx, arrowCanvas, color, type);
     item.appendChild(arrowCanvas);
 
     // Label
@@ -39,9 +39,12 @@ export default function VectorLegend(): DOM {
     return item;
   }
 
-  legendDiv.appendChild(createLegendItem('rgb(231, 77, 239)', 'Spring Force'));
-  legendDiv.appendChild(createLegendItem('#40bde8', 'Driving Force'));
-  legendDiv.appendChild(createLegendItem('#16960b', 'Drag Force'));
+  // legendDiv.appendChild(createLegendItem('rgb(231, 77, 239)', 'Spring Force', "dotted"));
+  legendDiv.appendChild(createLegendItem('yellow', 'Spring Force', "dotted"));
+  legendDiv.appendChild(createLegendItem('#40bde8', 'Driving Force', "solidWithBorder"));
+  // legendDiv.appendChild(createLegendItem('#16960b', 'Drag Force', "solid"));
+  // legendDiv.appendChild(createLegendItem('rgb(79, 204, 67)', 'Drag Force', "solid"));
+  legendDiv.appendChild(createLegendItem('rgb(79, 204, 67)', 'Drag Force', "hashed"));
 
   return new DOM(legendDiv);
 }

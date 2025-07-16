@@ -162,13 +162,14 @@ export class GraphComponent {
     this.referenceLine = this.svg.append('path')
       .attr('stroke', 'red')
       .attr('fill', 'none')
-      .attr('stroke-width', 2);
+      .attr('stroke-width', 2)
+      .attr('stroke-dasharray', '5,5');
 
     // Add test line (blue)
     this.testLine = this.svg.append('path')
       .attr('stroke', 'blue')
       .attr('fill', 'none')
-      .attr('stroke-width', 2);
+      .attr('stroke-width', 2)
   }
 
   public updateGraph(

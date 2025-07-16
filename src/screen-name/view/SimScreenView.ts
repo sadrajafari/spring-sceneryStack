@@ -8,7 +8,7 @@ import EquationInput from './EquationInput.js';
 // @ts-ignore
 import rk4Step from '../../common/rk4.js';
 import { GraphComponent } from '../../common/graph.js';
-import { CarouselComboBox, RectangularToggleButton } from 'scenerystack/sun';
+import { CarouselComboBox, RectangularToggleButton, ToggleSwitch } from 'scenerystack/sun';
 // @ts-ignore
 import drawVector from '../../common/drawVector.js';
 import VectorLegend from '../../common/VectorLegend.ts';
@@ -79,7 +79,7 @@ export class SimScreenView extends ScreenView {
   dragVectorCtxTest: CanvasRenderingContext2D;
   private graphUpdateCounter = 0;
   private readonly GRAPH_UPDATE_INTERVAL = 3;
-  equationDetectionPanel: Panel;
+  // equationDetectionPanel: Panel;
   existdrivingForceTest: boolean;
   existspringForceTest: boolean;
   existdragForceTest: boolean;
@@ -90,6 +90,9 @@ export class SimScreenView extends ScreenView {
   notAvailableDragForce: Text;
   notAvailableDrivingForce: Text;
   focusedEquationInput: any;
+  showSpringVectorProperty: Property<boolean>;
+  showDragVectorProperty: Property<boolean>;
+  showDrivingVectorProperty: Property<boolean>;
 
 
 
@@ -349,7 +352,68 @@ export class SimScreenView extends ScreenView {
     }), { fill: new Color("#d3d3d3"), maxWidth: 290 })
 
     this.addChild(equationPanel);
-    equationPanel.leftTop = new Vector2(10, constantPanel.leftBottom.y + 10);
+    equationPanel.leftTop = new Vector2(10, constantPanel.leftBottom.y + 5);
+
+
+
+
+
+    this.showSpringVectorProperty = new Property<boolean>(true);
+    this.showDragVectorProperty = new Property<boolean>(true);
+    this.showDrivingVectorProperty = new Property<boolean>(true);
+
+    const springVectorToggle = new ToggleSwitch(
+      this.showSpringVectorProperty, false, true, {scale: 0.7}
+    );
+    const dragVectorToggle = new ToggleSwitch(
+      this.showDragVectorProperty, false, true, {scale: 0.7}
+    );
+    const drivingVectorToggle = new ToggleSwitch(
+      this.showDrivingVectorProperty, false, true, {scale: 0.7}
+    );
+
+    
+
+
+    const settingsPanel = new Panel(new VBox({
+      align: 'center',
+      children: [
+        new Text("Vector Visualization", { fontSize: 16 }),
+        new Rectangle(0, 0, 280, 15),
+        new HBox({
+          align: 'center',
+          children: [
+            new Text("Show Spring Force Vector?", { fontSize: 13 }),
+            new Rectangle(0, 0, 10, 0),
+            springVectorToggle,
+          ]
+        }), 
+        new Rectangle(0, 0, 10, 10),
+        new HBox({
+          align: 'center',
+          children: [
+            new Text("Show Drag Force Vector?", { fontSize: 13 }),
+            new Rectangle(0, 0, 10, 0),
+            dragVectorToggle,
+          ]
+        }),
+        new Rectangle(0, 0, 10, 10),
+        new HBox({
+          align: 'center',
+          children: [
+            new Text("Show Driving Force Vector?", { fontSize: 13 }),
+            new Rectangle(0, 0, 10, 0),
+            drivingVectorToggle,
+          ]
+        }),
+      ]
+    }), {maxWidth: 290, fill: new Color("#d3d3d3")});
+
+    this.addChild(settingsPanel);
+
+    settingsPanel.leftTop = new Vector2 (equationPanel.leftTop.x, equationPanel.rightBottom.y + 5);
+
+    
 
 
 
@@ -380,42 +444,42 @@ export class SimScreenView extends ScreenView {
     }), { fill: new Color("#d3d3d3"), maxWidth: 290 })
 
     this.addChild(otherPanel);
-    otherPanel.leftTop = new Vector2(10, equationPanel.leftBottom.y + 10);
+    otherPanel.leftTop = new Vector2(10, settingsPanel.leftBottom.y + 5);
 
 
 
 
-    const availableSpringForce = new Text("Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
-    const availableDragForce = new Text("Drag Force Detected", { fontSize: 15, fill: '#16960b' });
-    const availableDrivingForce = new Text("Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
-    const notAvailableSpringForce = new Text("No Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
-    const notAvailableDragForce = new Text("No Drag Force Detected", { fontSize: 15, fill: '#16960b' });
-    const notAvailableDrivingForce = new Text("No Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
+    // const availableSpringForce = new Text("Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
+    // const availableDragForce = new Text("Drag Force Detected", { fontSize: 15, fill: '#16960b' });
+    // const availableDrivingForce = new Text("Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
+    // const notAvailableSpringForce = new Text("No Spring Force Detected", { fontSize: 15, fill: "rgb(231, 77, 239)" });
+    // const notAvailableDragForce = new Text("No Drag Force Detected", { fontSize: 15, fill: '#16960b' });
+    // const notAvailableDrivingForce = new Text("No Driving Force Detected", { fontSize: 15, fill: '#40bde8' });
 
-    this.availableSpringForce = availableSpringForce;
-    this.availableDragForce = availableDragForce;
-    this.availableDrivingForce = availableDrivingForce;
-    this.notAvailableSpringForce = notAvailableSpringForce;
-    this.notAvailableDragForce = notAvailableDragForce;
-    this.notAvailableDrivingForce = notAvailableDrivingForce;
+    // this.availableSpringForce = availableSpringForce;
+    // this.availableDragForce = availableDragForce;
+    // this.availableDrivingForce = availableDrivingForce;
+    // this.notAvailableSpringForce = notAvailableSpringForce;
+    // this.notAvailableDragForce = notAvailableDragForce;
+    // this.notAvailableDrivingForce = notAvailableDrivingForce;
 
-    const equationDetectionPanel = new Panel(new VBox({
-      align: 'left',
-      children: [
-        this.availableSpringForce,
-        this.availableDragForce,
-        this.availableDrivingForce,
-        this.notAvailableSpringForce,
-        this.notAvailableDragForce,
-        this.notAvailableDrivingForce
-      ]
-    }), { fill: new Color("rgb(255, 255, 255) "), maxWidth: 290 });
+    // const equationDetectionPanel = new Panel(new VBox({
+    //   align: 'left',
+    //   children: [
+    //     this.availableSpringForce,
+    //     this.availableDragForce,
+    //     this.availableDrivingForce,
+    //     this.notAvailableSpringForce,
+    //     this.notAvailableDragForce,
+    //     this.notAvailableDrivingForce
+    //   ]
+    // }), { fill: new Color("rgb(255, 255, 255) "), maxWidth: 290 });
 
-    this.addChild(equationDetectionPanel);
-    this.equationDetectionPanel = equationDetectionPanel;
-    equationDetectionPanel.leftTop = new Vector2(equationPanel.rightTop.x + 5, equationPanel.rightCenter.y - 20);
+    // this.addChild(equationDetectionPanel);
+    // this.equationDetectionPanel = equationDetectionPanel;
+    // equationDetectionPanel.leftTop = new Vector2(equationPanel.rightTop.x + 5, equationPanel.rightCenter.y - 20);
 
-    equationDetectionPanel.opacity = 0; // Initially disabled
+    // equationDetectionPanel.opacity = 0; // Initially disabled
 
 
 
@@ -1277,34 +1341,34 @@ export class SimScreenView extends ScreenView {
 
 
 
-  updateEquationDetectionPanel() {
-    const contentNode = this.equationDetectionPanel._content as VBox;
-    contentNode.removeAllChildren();
+  // updateEquationDetectionPanel() {
+  //   const contentNode = this.equationDetectionPanel._content as VBox;
+  //   contentNode.removeAllChildren();
 
-    if (this.existspringForceTest) {
-      contentNode.addChild(this.availableSpringForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    } else {
-      contentNode.addChild(this.notAvailableSpringForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    }
+  //   if (this.existspringForceTest) {
+  //     contentNode.addChild(this.availableSpringForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   } else {
+  //     contentNode.addChild(this.notAvailableSpringForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   }
 
-    if (this.existdragForceTest) {
-      contentNode.addChild(this.availableDragForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    } else {
-      contentNode.addChild(this.notAvailableDragForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    }
+  //   if (this.existdragForceTest) {
+  //     contentNode.addChild(this.availableDragForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   } else {
+  //     contentNode.addChild(this.notAvailableDragForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   }
 
-    if (this.existdrivingForceTest) {
-      contentNode.addChild(this.availableDrivingForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    } else {
-      contentNode.addChild(this.notAvailableDrivingForce);
-      contentNode.addChild(new Rectangle(0, 0, 0, 2));
-    }
-  }
+  //   if (this.existdrivingForceTest) {
+  //     contentNode.addChild(this.availableDrivingForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   } else {
+  //     contentNode.addChild(this.notAvailableDrivingForce);
+  //     contentNode.addChild(new Rectangle(0, 0, 0, 2));
+  //   }
+  // }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public step(dt: number): void {
@@ -1377,9 +1441,11 @@ export class SimScreenView extends ScreenView {
 
 
       // Drag force vector
-      if (dragForce !== 0) {
+      if (dragForce !== 0 && this.showDragVectorProperty.value) {
         this.dragVectorCanvas.style.left = `${boxCenter - this.dragVectorCanvas.width / 2}px`;
-        drawVector(Math.abs(dragForce) <= 0.01 ? 0 : dragForce, this.dragVectorCtx, this.dragVectorCanvas, " #16960b ");
+        // drawVector(Math.abs(dragForce) <= 0.01 ? 0 : dragForce, this.dragVectorCtx, this.dragVectorCanvas, " #16960b ", "solid");
+        // drawVector(Math.abs(dragForce) <= 0.01 ? 0 : dragForce, this.dragVectorCtx, this.dragVectorCanvas, " rgb(79, 204, 67) ", "solid");
+        drawVector(Math.abs(dragForce) <= 0.01 ? 0 : dragForce, this.dragVectorCtx, this.dragVectorCanvas, " rgb(79, 204, 67) ", "hashed");
       }
       else {
         this.dragVectorCtx.clearRect(0, 0, this.dragVectorCanvas.width, this.dragVectorCanvas.height);
@@ -1387,9 +1453,10 @@ export class SimScreenView extends ScreenView {
 
 
       // Spring force vector
-      if (springForce !== 0) {
+      if (springForce !== 0 && this.showSpringVectorProperty.value) {
         this.springVectorCanvas.style.left = `${boxCenter - this.springVectorCanvas.width / 2}px`;
-        drawVector(Math.abs(springForce) <= 0.01 ? 0 : springForce, this.springVectorCtx, this.springVectorCanvas, " rgb(231, 77, 239) ");
+        // drawVector(Math.abs(springForce) <= 0.01 ? 0 : springForce, this.springVectorCtx, this.springVectorCanvas, " rgb(231, 77, 239) ", "dotted");
+        drawVector(Math.abs(springForce) <= 0.01 ? 0 : springForce, this.springVectorCtx, this.springVectorCanvas, " yellow ", "dotted");
       } else {
         this.springVectorCtx.clearRect(0, 0, this.springVectorCanvas.width, this.springVectorCanvas.height);
       }
@@ -1397,12 +1464,12 @@ export class SimScreenView extends ScreenView {
 
 
 
-      if (this.model.f !== 0) {
+      if (this.model.f !== 0 && this.showDrivingVectorProperty.value) {
         this.forceVectorCanvas.style.display = '';
         this.forceVectorCanvas.style.left = `${boxCenter - this.forceVectorCanvas.width / 2}px`;
         const forceValue = this.model.f * Math.sin(this.model.omega * this.time);
 
-        drawVector(Math.abs(drivingForce) < 0.01 ? 0 : drivingForce, this.forceVectorCtx, this.forceVectorCanvas, "#40bde8 ");
+        drawVector(Math.abs(drivingForce) < 0.01 ? 0 : drivingForce, this.forceVectorCtx, this.forceVectorCanvas, "#40bde8 ", "solidWithBorder");
       } else {
         // this.forceVectorCanvas.style.display = 'none';
         this.forceVectorCtx.clearRect(0, 0, this.forceVectorCanvas.width, this.forceVectorCanvas.height);
@@ -1439,25 +1506,25 @@ export class SimScreenView extends ScreenView {
 
 
 
-        this.equationDetectionPanel.opacity = 1;
-        if (drivingForceTest !== undefined) {
-          this.existdrivingForceTest = true;
-        } else {
-          this.existdrivingForceTest = false;
-        }
-        if (springForceTest !== undefined) {
-          this.existspringForceTest = true;
-        } else {
-          this.existspringForceTest = false;
-        }
-        if (dragForceTest !== undefined) {
-          this.existdragForceTest = true;
-        } else {
-          this.existdragForceTest = false;
-        }
+        // this.equationDetectionPanel.opacity = 1;
+        // if (drivingForceTest !== undefined) {
+        //   this.existdrivingForceTest = true;
+        // } else {
+        //   this.existdrivingForceTest = false;
+        // }
+        // if (springForceTest !== undefined) {
+        //   this.existspringForceTest = true;
+        // } else {
+        //   this.existspringForceTest = false;
+        // }
+        // if (dragForceTest !== undefined) {
+        //   this.existdragForceTest = true;
+        // } else {
+        //   this.existdragForceTest = false;
+        // }
 
 
-        this.updateEquationDetectionPanel();
+        // this.updateEquationDetectionPanel();
 
         const boxLeft = this.playAreaCenter + this.newXTest * this.scale - this.boxWidth / 2;
         const boxCenter = boxLeft + this.boxWidth / 2;
@@ -1467,9 +1534,11 @@ export class SimScreenView extends ScreenView {
 
 
         // Drag force vector
-        if (dragForceTest !== 0) {
+        if (dragForceTest !== 0 && this.showDragVectorProperty.value) {
           this.dragVectorCanvasTest.style.left = `${boxCenter - this.dragVectorCanvasTest.width / 2}px`;
-          drawVector(Math.abs(dragForceTest) <= 0.01 ? 0 : dragForceTest, this.dragVectorCtxTest, this.dragVectorCanvasTest, " #16960b ");
+          // drawVector(Math.abs(dragForceTest) <= 0.01 ? 0 : dragForceTest, this.dragVectorCtxTest, this.dragVectorCanvasTest, " #16960b ", "solid");
+          // drawVector(Math.abs(dragForceTest) <= 0.01 ? 0 : dragForceTest, this.dragVectorCtxTest, this.dragVectorCanvasTest, "rgb(79, 204, 67) ", "solid");
+          drawVector(Math.abs(dragForceTest) <= 0.01 ? 0 : dragForceTest, this.dragVectorCtxTest, this.dragVectorCanvasTest, "rgb(79, 204, 67) ", "hashed");
         }
         else {
           this.dragVectorCtxTest.clearRect(0, 0, this.dragVectorCanvasTest.width, this.dragVectorCanvasTest.height);
@@ -1477,9 +1546,10 @@ export class SimScreenView extends ScreenView {
 
 
         // Spring force vector
-        if (springForceTest !== 0) {
+        if (springForceTest !== 0 && this.showSpringVectorProperty.value) {
           this.springVectorCanvasTest.style.left = `${boxCenter - this.springVectorCanvasTest.width / 2}px`;
-          drawVector(Math.abs(springForceTest) <= 0.01 ? 0 : springForceTest, this.springVectorCtxTest, this.springVectorCanvasTest, " rgb(231, 77, 239) ");
+          // drawVector(Math.abs(springForceTest) <= 0.01 ? 0 : springForceTest, this.springVectorCtxTest, this.springVectorCanvasTest, " rgb(231, 77, 239) ", "dotted");
+          drawVector(Math.abs(springForceTest) <= 0.01 ? 0 : springForceTest, this.springVectorCtxTest, this.springVectorCanvasTest, " yellow ", "dotted");
         } else {
           this.springVectorCtxTest.clearRect(0, 0, this.springVectorCanvasTest.width, this.springVectorCanvasTest.height);
         }
@@ -1487,10 +1557,11 @@ export class SimScreenView extends ScreenView {
 
 
 
-        if (drivingForceTest !== 0) {
+        if (drivingForceTest !== 0 && this.showDrivingVectorProperty.value) {
           this.forceVectorCanvasTest.style.left = `${boxCenter - this.forceVectorCanvasTest.width / 2}px`;
 
-          drawVector(Math.abs(drivingForceTest) < 0.01 ? 0 : drivingForceTest, this.forceVectorCtxTest, this.forceVectorCanvasTest, "#40bde8 ");
+          drawVector(Math.abs(drivingForceTest) < 0.01 ? 0 : drivingForceTest, this.forceVectorCtxTest, this.forceVectorCanvasTest, "#40bde8 ", "solidWithBorder");
+          // drawVector(Math.abs(drivingForceTest) < 0.01 ? 0 : drivingForceTest, this.forceVectorCtxTest, this.forceVectorCanvasTest, "#40bde8 ", "hashed");
         } else {
           this.forceVectorCtxTest.clearRect(0, 0, this.forceVectorCanvasTest.width, this.forceVectorCanvasTest.height);
         }
@@ -1531,7 +1602,7 @@ export class SimScreenView extends ScreenView {
 
 
       } else {
-        this.equationDetectionPanel.opacity = 0;
+        // this.equationDetectionPanel.opacity = 0;
       }
 
 
