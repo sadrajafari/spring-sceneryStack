@@ -111,6 +111,8 @@ export class SimScreenView extends ScreenView {
   showSpringVectorProperty: Property<boolean>;
   showDragVectorProperty: Property<boolean>;
   showDrivingVectorProperty: Property<boolean>;
+  pauseButton: RoundToggleButton<boolean>;
+  ResumeButton: RoundToggleButton<boolean>;
 
   public constructor(model: SimModel, options?: ScreenViewOptions) {
     super(options);
@@ -127,6 +129,7 @@ export class SimScreenView extends ScreenView {
       content: pauseSign,
       baseColor: "#f44949",
     });
+    this.pauseButton = pauseButton;
     // const ResumeButton = new RectangularToggleButton(resume, false, true, { minWidth: 140, maxHeight: 20, content: new RichText('▶'), baseColor: "#41b3d5" })
     const resumeSign = new Text("⏵︎", { fontSize: 25, maxWidth: 40 });
     // const ResumeButton = new RectangularToggleButton(resume, false, true, { minWidth: 140, maxHeight: 20, content: resumeSign, baseColor: "#41b3d5" })
@@ -138,6 +141,8 @@ export class SimScreenView extends ScreenView {
       content: resumeSign,
       baseColor: "#41b3d5",
     });
+
+    this.ResumeButton = ResumeButton;
     // this.addChild(pauseButton)
     // this.addChild(ResumeButton)
 
@@ -317,6 +322,7 @@ export class SimScreenView extends ScreenView {
     const buttonBeta = new Property<boolean>(false);
     const buttonF = new Property<boolean>(false);
     const buttonOmega = new Property<boolean>(false);
+    const buttonSimSpeed = new Property<boolean>(false);
 
     const toggleRadius = 13;
     const buttonVBoxConstants = new VBox({
@@ -379,6 +385,11 @@ export class SimScreenView extends ScreenView {
     });
     buttonOmega.lazyLink(() => {
       model.omegaProperty.value = Number(window.prompt("Enter value for ω:"));
+    });
+    buttonSimSpeed.lazyLink(() => {
+      model.simSpeedProperty.value = Number(
+        window.prompt("Enter value for simulation speed:"),
+      );
     });
 
     const constantPanel = new Panel(
@@ -626,6 +637,17 @@ export class SimScreenView extends ScreenView {
       }
     });
 
+    const simSpeedButton = new RoundToggleButton(
+      buttonSimSpeed,
+      false,
+      true,
+      {
+        radius: toggleRadius,
+        content: new Text("✎", { fontSize: 120, maxWidth: 15 }),
+      },
+    );
+    simSpeedButton.scale(0.9)
+
     const simSpeedSlider = new HSlider(
       model.simSpeedProperty,
       new Range(0.1, 2),
@@ -649,7 +671,9 @@ export class SimScreenView extends ScreenView {
                 { fontSize: 16 },
               ),
               new Text("x", { fontSize: 16 }),
-              new Rectangle(0, 0, 60, 0),
+              new Rectangle(0, 0, 5, 0),
+              simSpeedButton,
+              new Rectangle(0, 0, 50, 0),
               pauseButton,
               ResumeButton,
               new Rectangle(0, 0, 5, 0),
@@ -1468,6 +1492,7 @@ export class SimScreenView extends ScreenView {
         }
       }
     });
+    this.reset();
   }
 
   public restoreRun(): void {
@@ -1542,6 +1567,10 @@ export class SimScreenView extends ScreenView {
   }
 
   public reset(): void {
+    this.model.paused = false;
+    this.pauseButton.visible = true;
+    this.ResumeButton.visible = false;
+
     this.vdotLatex = this.vdotxInput.mathField.latex();
     this.xdotLatex = this.xdotInput.mathField.latex();
 
