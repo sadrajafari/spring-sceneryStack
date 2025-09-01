@@ -7,10 +7,10 @@ export class SimModel {
   public betaProperty: Property<number> = new Property(0.5);
   public fProperty: Property<number> = new Property(1);
   public omegaProperty: Property<number> = new Property(1);
-  public simSpeedProperty: Property<number> = new Property(0.5);
+  public simSpeedProperty: Property<number> = new Property(1);
   public vdotxEQProperty: Property<string> = new Property(new URLSearchParams(window.location.search).get("formula") === "true" ? "-\\omega_0^2\\cdot x-\\beta\\cdot v+f\\cdot\\sin\\left(\\omega\\cdot t\\right)" : "");
   public xdotEQProperty: Property<string> = new Property(new URLSearchParams(window.location.search).get("formula") === "true" ? "v" : "");
-
+  public pausedProperty: Property<boolean> = new Property(false);
 
 
 
@@ -25,6 +25,7 @@ export class SimModel {
   initialOmega: number;
   omega: number;
   simSpeed: number;
+  paused: boolean;
 
   constructor() {
 
@@ -38,6 +39,7 @@ export class SimModel {
     this.simSpeed = this.simSpeedProperty.value;
     this.vdotxEQ = this.vdotxEQProperty.value;
     this.xdotEQ = this.xdotEQProperty.value;
+    this.paused = this.pausedProperty.value;
 
 
     
