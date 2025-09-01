@@ -141,7 +141,8 @@ export class SimScreenView extends ScreenView {
     // this.addChild(pauseButton)
     // this.addChild(ResumeButton)
 
-    ResumeButton.visible = false;
+    ResumeButton.visible = true;
+    pauseButton.visible = false;
 
     const resetAllButton = new ResetAllButton({
       listener: () => {
@@ -617,8 +618,12 @@ export class SimScreenView extends ScreenView {
     });
     resume.lazyLink((e) => {
       this.model.paused = !this.model.paused;
-      pauseButton.visible = !pauseButton.visible;
       ResumeButton.visible = !ResumeButton.visible;
+      pauseButton.visible = !pauseButton.visible;
+      if (this.time === 0) {
+        this.model.paused = false;
+        this.reset();
+      }
     });
 
     const simSpeedSlider = new HSlider(
@@ -1370,6 +1375,9 @@ export class SimScreenView extends ScreenView {
           // );
           changingWithId[0] = false;
           changingWithId[1] = -1;
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
           this.reset();
         } else if (changingWithId[1] === 362 || changingWithId[1] === 370) {
           // setTimeout(
@@ -1391,6 +1399,9 @@ export class SimScreenView extends ScreenView {
           // );
           changingWithId[0] = false;
           changingWithId[1] = -1;
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
           this.reset();
         } else if (changingWithId[1] === 376 || changingWithId[1] === 384) {
           // setTimeout(
@@ -1413,6 +1424,9 @@ export class SimScreenView extends ScreenView {
           changingWithId[0] = false;
           changingWithId[1] = -1;
           this.reset();
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
         } else if (changingWithId[1] === 390 || changingWithId[1] === 398) {
           // setTimeout(
           //   () =>
@@ -1433,14 +1447,23 @@ export class SimScreenView extends ScreenView {
           // );
           changingWithId[0] = false;
           changingWithId[1] = -1;
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
           this.reset();
         } else if (changingWithId[1] === 404 || changingWithId[1] === 412) {
           changingWithId[0] = false;
           changingWithId[1] = -1;
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
           this.reset();
         } else if (changingWithId[1] === 418 || changingWithId[1] === 426) {
           changingWithId[0] = false;
           changingWithId[1] = -1;
+          this.model.paused = false;
+          pauseButton.visible = true;
+          ResumeButton.visible = false;
           this.reset();
         }
       }
