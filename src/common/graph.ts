@@ -102,8 +102,8 @@ export class GraphComponent {
   private svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>;
   private xScale: d3.ScaleLinear<number, number>;
   private yScale: d3.ScaleLinear<number, number>;
-  private xAxis: d3.Axis<number>;
-  private yAxis: d3.Axis<number>;
+  private xAxis: d3.Axis<d3.NumberValue>;
+  private yAxis: d3.Axis<d3.NumberValue>;
   private referenceLine: d3.Selection<SVGPathElement, unknown, HTMLElement, any>;
   private testLine: d3.Selection<SVGPathElement, unknown, HTMLElement, any>;
   private referenceData: { time: number; value: number }[] = [];

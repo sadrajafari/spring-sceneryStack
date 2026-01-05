@@ -28,6 +28,7 @@ import rk4Step from "../../common/rk4.js";
 import { GraphComponent } from "../../common/graph.js";
 import {
   CarouselComboBox,
+  RectangularPushButton,
   RectangularToggleButton,
   ToggleSwitch,
 } from "scenerystack/sun";
@@ -75,14 +76,14 @@ export class SimScreenView extends ScreenView {
   xdotInput: any;
   stop: boolean;
   runHistory: any;
-  comboBoxProperty: Property<string>;
-  comboBoxItems: { value: string; createNode: () => Text }[];
-  comboBox: CarouselComboBox<string>;
+  // comboBoxProperty: Property<string>;
+  // comboBoxItems: { value: string; createNode: () => Text }[];
+  // comboBox: CarouselComboBox<string>;
   updateComboBox: (runs: string[]) => void;
   selectedRunProperty: Property<string>;
   vdotLatex: string | any;
   xdotLatex: string | any;
-  restoringRun: boolean;
+  // restoringRun: boolean;
   forceVectorCanvas: HTMLCanvasElement;
   forceVectorCtx: CanvasRenderingContext2D;
   forceVectorCanvasTest: HTMLCanvasElement;
@@ -98,21 +99,21 @@ export class SimScreenView extends ScreenView {
   private graphUpdateCounter = 0;
   private readonly GRAPH_UPDATE_INTERVAL = 3;
   // equationDetectionPanel: Panel;
-  existdrivingForceTest: boolean;
-  existspringForceTest: boolean;
-  existdragForceTest: boolean;
-  availableSpringForce: Text;
-  availableDragForce: Text;
-  notAvailableSpringForce: Text;
-  availableDrivingForce: Text;
-  notAvailableDragForce: Text;
-  notAvailableDrivingForce: Text;
+  // existdrivingForceTest: boolean;
+  // existspringForceTest: boolean;
+  // existdragForceTest: boolean;
+  // availableSpringForce: Text;
+  // availableDragForce: Text;
+  // notAvailableSpringForce: Text;
+  // availableDrivingForce: Text;
+  // notAvailableDragForce: Text;
+  // notAvailableDrivingForce: Text;
   focusedEquationInput: any;
   showSpringVectorProperty: Property<boolean>;
   showDragVectorProperty: Property<boolean>;
   showDrivingVectorProperty: Property<boolean>;
-  pauseButton: RoundToggleButton<boolean>;
-  ResumeButton: RoundToggleButton<boolean>;
+  pauseButton: RectangularToggleButton<boolean>;
+  ResumeButton: RectangularToggleButton<boolean>;
 
   public constructor(model: SimModel, options?: ScreenViewOptions) {
     super(options);
@@ -121,9 +122,10 @@ export class SimScreenView extends ScreenView {
     const resume = new Property<boolean>(false);
 
     const pauseSign = new Text("⏸︎", { fontSize: 25, maxWidth: 40 });
-    const pauseButton = new RoundToggleButton(pause, false, true, {
-      maxHeight: 100,
-      scale: 1.1,
+    const pauseButton = new RectangularToggleButton(pause, false, true, {
+      minHeight: 40,
+      minWidth: 40,
+      scale: 1,
       xAlign: "center",
       yAlign: "center",
       content: pauseSign,
@@ -133,9 +135,10 @@ export class SimScreenView extends ScreenView {
     // const ResumeButton = new RectangularToggleButton(resume, false, true, { minWidth: 140, maxHeight: 20, content: new RichText('▶'), baseColor: "#41b3d5" })
     const resumeSign = new Text("⏵︎", { fontSize: 25, maxWidth: 40 });
     // const ResumeButton = new RectangularToggleButton(resume, false, true, { minWidth: 140, maxHeight: 20, content: resumeSign, baseColor: "#41b3d5" })
-    const ResumeButton = new RoundToggleButton(resume, false, true, {
-      maxHeight: 120,
-      scale: 1.1,
+    const ResumeButton = new RectangularToggleButton(resume, false, true, {
+      minHeight: 40,
+      minWidth: 40,
+      scale: 1,
       xAlign: "center",
       yAlign: "center",
       content: resumeSign,
@@ -149,7 +152,8 @@ export class SimScreenView extends ScreenView {
     ResumeButton.visible = true;
     pauseButton.visible = false;
 
-    const resetAllButton = new ResetAllButton({
+    const resetAllButton = new RectangularPushButton({
+      content: new Text("⏮", { fontSize: 20, fill: "black" }),
       listener: () => {
         this.interruptSubtreeInput();
         model.reset();
@@ -158,8 +162,8 @@ export class SimScreenView extends ScreenView {
         pauseButton.visible = true;
         ResumeButton.visible = false;
       },
-      right: 70,
-      bottom: this.layoutBounds.maxY - 10,
+      minWidth: 40,
+      minHeight: 40,
     });
     // this.addChild(resetAllButton);
 
@@ -1379,7 +1383,8 @@ export class SimScreenView extends ScreenView {
 
     window.addEventListener("pointerup", () => {
       if (changingWithId[0]) {
-        if (changingWithId[1] === 348 || changingWithId[1] === 356) {
+        console.log("Pointer up detected, changingWithId:", changingWithId);
+        if (changingWithId[1] === 346 || changingWithId[1] === 354) {
           // setTimeout(
           //   () =>
           //     post(
@@ -1403,7 +1408,7 @@ export class SimScreenView extends ScreenView {
           pauseButton.visible = true;
           ResumeButton.visible = false;
           this.reset();
-        } else if (changingWithId[1] === 362 || changingWithId[1] === 370) {
+        } else if (changingWithId[1] === 360 || changingWithId[1] === 368) {
           // setTimeout(
           //   () =>
           //     post(
@@ -1427,7 +1432,7 @@ export class SimScreenView extends ScreenView {
           pauseButton.visible = true;
           ResumeButton.visible = false;
           this.reset();
-        } else if (changingWithId[1] === 376 || changingWithId[1] === 384) {
+        } else if (changingWithId[1] === 374 || changingWithId[1] === 382) {
           // setTimeout(
           //   () =>
           //     post(
@@ -1451,7 +1456,7 @@ export class SimScreenView extends ScreenView {
           this.model.paused = false;
           pauseButton.visible = true;
           ResumeButton.visible = false;
-        } else if (changingWithId[1] === 390 || changingWithId[1] === 398) {
+        } else if (changingWithId[1] === 388 || changingWithId[1] === 396) {
           // setTimeout(
           //   () =>
           //     post(
@@ -1475,14 +1480,14 @@ export class SimScreenView extends ScreenView {
           pauseButton.visible = true;
           ResumeButton.visible = false;
           this.reset();
-        } else if (changingWithId[1] === 404 || changingWithId[1] === 412) {
+        } else if (changingWithId[1] === 402 || changingWithId[1] === 410) {
           changingWithId[0] = false;
           changingWithId[1] = -1;
           this.model.paused = false;
           pauseButton.visible = true;
           ResumeButton.visible = false;
           this.reset();
-        } else if (changingWithId[1] === 418 || changingWithId[1] === 426) {
+        } else if (changingWithId[1] === 416 || changingWithId[1] === 424) {
           changingWithId[0] = false;
           changingWithId[1] = -1;
           this.model.paused = false;

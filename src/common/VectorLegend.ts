@@ -1,4 +1,5 @@
 import { DOM } from "scenerystack/scenery";
+// @ts-ignore
 import drawVector from "./drawVector.js";
 
 export default function VectorLegend(): DOM {
