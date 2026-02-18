@@ -1,6 +1,8 @@
 import { ScreenView, ScreenViewOptions, Sim } from "scenerystack/sim";
 import { SimModel } from "../model/SimModel.js";
 import { ResetAllButton } from "scenerystack/scenery-phet";
+// @ts-ignore
+import { questionButton } from "./questionSign.js";
 import {
   Circle,
   Color,
@@ -35,6 +37,7 @@ import {
 // @ts-ignore
 import drawVector from "../../common/drawVector.js";
 import VectorLegend from "../../common/VectorLegend.ts";
+import HelpDialog from "./HelpDialog.ts";
 
 export class SimScreenView extends ScreenView {
   domNode: any;
@@ -528,11 +531,40 @@ export class SimScreenView extends ScreenView {
       spacing: 8,
     });
 
+    // Info button for equation help
+    const fillEquationsCallback = (equations: { v: string; x: string }) => {
+      // Update the velocity equation field
+      this.vdotxInput.mathField.latex(equations.v);
+
+      // Update the x equation field
+      this.xdotInput.mathField.latex(equations.x);
+
+      // Update the model with the new equations
+      this.model.vdotxEQProperty.value = equations.v;
+      this.model.xdotEQProperty.value = equations.x;
+    };
+
+    const helpDialog = new HelpDialog(this.tandem, fillEquationsCallback);
+
+    const questionNode = questionButton();
+    
+
+    // const helpDialog = new HelpDialog(undefined as any);
+
+    questionNode.addInputListener({
+      down: () => {
+        helpDialog.show();
+      },
+    });
+
     const equationPanel = new Panel(
       new VBox({
         align: "center",
         children: [
-          new Text("Equations", { fontSize: 16 }),
+          new HBox({
+            align: "center",
+            children: [new Text("Equations", { fontSize: 16 }), new Rectangle(0, 0, 5, 5), questionNode],
+          }),
           new Rectangle(0, 0, 5, 5),
           insertButtonsBox,
           new Rectangle(0, 0, 5, 5),
@@ -641,16 +673,11 @@ export class SimScreenView extends ScreenView {
       }
     });
 
-    const simSpeedButton = new RoundToggleButton(
-      buttonSimSpeed,
-      false,
-      true,
-      {
-        radius: toggleRadius,
-        content: new Text("✎", { fontSize: 120, maxWidth: 15 }),
-      },
-    );
-    simSpeedButton.scale(0.9)
+    const simSpeedButton = new RoundToggleButton(buttonSimSpeed, false, true, {
+      radius: toggleRadius,
+      content: new Text("✎", { fontSize: 120, maxWidth: 15 }),
+    });
+    simSpeedButton.scale(0.9);
 
     const simSpeedSlider = new HSlider(
       model.simSpeedProperty,
